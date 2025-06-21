@@ -127,42 +127,23 @@ async function submitRSVP(data) {
     }
 }
 
-// Function to load webhook configuration (build-time or development)
-async function getWebhookConfig() {
-    // Use build-time injected configuration (production)
+// Function to get webhook configuration
+function getWebhookConfig() {
+    // Check if window.WEBHOOK_CONFIG is available (loaded from config.js)
     if (window.WEBHOOK_CONFIG) {
         return {
-            RSVP_WEBHOOK_URL: window.WEBHOOK_CONFIG.rsvpUrl,
-            DISCORD_WEBHOOK_URL: window.WEBHOOK_CONFIG.discordUrl
+            RSVP_WEBHOOK_URL: window.WEBHOOK_CONFIG.RSVP_WEBHOOK_URL,
+            DISCORD_WEBHOOK_URL: window.WEBHOOK_CONFIG.DISCORD_WEBHOOK_URL
         };
     }
     
-    // Fallback for local development - try to load .env
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        try {
-            const response = await fetch('.env');
-            if (response.ok) {
-                const text = await response.text();
-                const envVars = {};
-                text.split('\n').forEach(line => {
-                    const [key, value] = line.split('=');
-                    if (key && value) {
-                        envVars[key.trim()] = value.trim();
-                    }
-                });
-                return envVars;
-            }
-        } catch (error) {
-            console.warn('Local .env file not found, using production config');
-        }
-    }
-    
-    throw new Error('Webhook configuration not available. Please check deployment.');
+    // Fallback if config.js is not loaded
+    throw new Error('Webhook configuration not loaded. Make sure config.js is included.');
 }
 
 // Send RSVP data to webhook with enhanced security
 async function sendToWebhook(data) {
-    const config = await getWebhookConfig();
+    const config = getWebhookConfig();
     const WEBHOOK_URL = config.RSVP_WEBHOOK_URL;
     
     if (!WEBHOOK_URL) {
@@ -213,7 +194,7 @@ async function sendToWebhook(data) {
 
 // Send RSVP receipt to Discord with enhanced security
 async function sendToDiscord(data) {
-    const config = await getWebhookConfig();
+    const config = getWebhookConfig();
     const DISCORD_URL = config.DISCORD_WEBHOOK_URL;
     
     if (!DISCORD_URL) {
@@ -688,25 +669,22 @@ window.quickWebhookTest = async function() {
 };
 
 // Function to test webhook with current configuration
-window.testWebhookConfig = async function() {
+window.testWebhookConfig = function() {
     console.log('🔧 Testing webhook configuration...');
     
     try {
-        const config = await getWebhookConfig();
+        const config = getWebhookConfig();
         
         console.log('📄 Webhook Configuration Status:');
         console.log('RSVP Webhook:', config.RSVP_WEBHOOK_URL ? '✅ Configured' : '❌ Missing');
         console.log('Discord Webhook:', config.DISCORD_WEBHOOK_URL ? '✅ Configured' : '❌ Missing');
+        console.log('🔧 Configuration loaded from config.js file');
         
-        if (window.WEBHOOK_CONFIG) {
-            console.log('📦 Build-time config detected');
+        if (window.WEBHOOK_CONFIG && window.WEBHOOK_CONFIG.buildTime) {
             console.log('Build time:', window.WEBHOOK_CONFIG.buildTime);
-        } else {
-            console.log('🔧 Development mode - using .env file');
         }
         
         return config;
-        
     } catch (error) {
         console.error('❌ Configuration Error:', error.message);
         return null;
@@ -754,5 +732,5 @@ console.log('Available test functions:');
 console.log('- testWebhook() - Test both main webhook and Discord');
 console.log('- testDiscordWebhook() - Test Discord webhook only');
 console.log('- quickWebhookTest() - Quick test of both webhooks');
-console.log('- testWebhookConfig() - Check .env configuration');
+console.log('- testWebhookConfig() - Check webhook configuration');
 console.log('💡 Call any of these functions in the console to test webhooks!');

@@ -5,17 +5,15 @@ A magical static website for Clare and Brian's baby shower with a beautiful Sail
 ## 🚀 Quick Start
 
 1. **Clone/Download**: Get the website files
-2. **Configure Webhooks**: Copy `.env.example` to `.env` and add your webhook URLs
-3. **Test Setup**: Open `webhook-test.html` to verify configuration
-4. **View Website**: Open `index.html` in your web browser
-5. **Deploy**: Upload files to any static hosting service
+2. **View Website**: Open `index.html` in your web browser
+3. **Test Setup**: Open `webhook-test.html` to verify webhook functionality
+4. **Deploy**: Upload files to any static hosting service
 
 ## 📁 Project Structure
 
 - `index.html` - Main website structure and content
 - `styles.css` - Complete styling and Sailor Moon themed design
-- `script.js` - Interactive functionality and RSVP form handling
-- `.env.example` - Template for webhook configuration
+- `script.js` - Interactive functionality and RSVP form handling (includes webhook configuration)
 - `webhook-test.html` - Test interface for webhook validation
 
 ## ✨ Features
@@ -30,41 +28,23 @@ A magical static website for Clare and Brian's baby shower with a beautiful Sail
 
 ## 🔧 Configuration
 
-### For Production (GitHub Pages)
+### Webhook URLs
 
-The site uses **build-time environment variable injection**:
+Webhook URLs are configured directly in `script.js` in the `WEBHOOK_CONFIG` object:
 
-1. **Set GitHub Secrets**:
-   - Repository → Settings → Secrets and variables → Actions
-   - Add: `RSVP_WEBHOOK_URL` and `DISCORD_WEBHOOK_URL`
-
-2. **Deploy**:
-   - Push to main branch
-   - Webhook URLs are securely injected during build
-   - No sensitive data in deployed files
-
-### For Local Development
-
-**Step 1**: Copy the example file:
-
-```bash
-cp .env.example .env
+```javascript
+const WEBHOOK_CONFIG = {
+    RSVP_WEBHOOK_URL: 'https://your-webhook-url.com/endpoint',
+    DISCORD_WEBHOOK_URL: 'https://discord.com/api/webhooks/your-webhook-id/your-token'
+};
 ```
 
-**Step 2**: Edit `.env` with your webhook URLs:
-
-```env
-# Main webhook for RSVP data processing (n8n, Zapier, etc.)
-RSVP_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
-
-# Discord webhook for instant notifications
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your-webhook-id/your-token
-```
+To update the webhooks, simply edit these URLs in the `script.js` file.
 
 ### RSVP Data Flow
 
 1. **User submits RSVP** → Form validation
-2. **Main webhook** → Sends structured data to your n8n/automation system
+2. **Main webhook** → Sends structured data to your automation system
 3. **Discord webhook** → Sends beautiful embed notification to Discord channel
 4. **User feedback** → Shows success/error messages
 
@@ -85,7 +65,7 @@ testWebhookConfig()     // Check configuration status
 
 Open `webhook-test.html` for a visual testing interface.
 
-**Note**: In production, configuration is automatically injected during build. For local development, ensure your `.env` file is properly configured.
+**Note**: Webhook URLs are now included directly in the code. No additional configuration needed.
 
 ## 📄 Webhook Data Formats
 

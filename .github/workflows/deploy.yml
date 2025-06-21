@@ -22,28 +22,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+        
       - name: Setup Pages
         uses: actions/configure-pages@v5
-
-      - name: Inject environment variables into JavaScript
-        env:
-          RSVP_WEBHOOK_URL: ${{ secrets.RSVP_WEBHOOK_URL }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          # Create a config file that gets injected into the build
-          cat > config.js << EOF
-          window.WEBHOOK_CONFIG = {
-            rsvpUrl: '${RSVP_WEBHOOK_URL}',
-            discordUrl: '${DISCORD_WEBHOOK_URL}',
-            buildTime: '$(date -u +"%Y-%m-%dT%H:%M:%SZ")'
-          };
-          EOF
-          
-          echo "✅ Configuration injected into build"
-            # Verify config file
-          echo "📄 Configuration created:"
-          echo "window.WEBHOOK_CONFIG = { rsvpUrl: '***', discordUrl: '***', buildTime: '...' };"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
