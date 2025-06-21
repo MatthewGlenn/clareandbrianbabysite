@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clare & Brian's Sailor Moon Baby Shower</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navigation">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a href="#details" class="nav-link">Details</a></li>
+                <li><a href="#registry" class="nav-link">Registry</a></li>
+                <li><a href="#rsvp" class="nav-link">RSVP</a></li>
+            </ul>
+        </div>
+    </nav>    <!-- Header with Sailor Moon Theme -->
+    <header class="hero-section">
+        <div class="stars-container">
+            <div class="star star-1">✨</div>
+            <div class="star star-2">⭐</div>
+            <div class="star star-3">🌟</div>
+            <div class="star star-4">✨</div>
+            <div class="star star-5">⭐</div>
+            <div class="star star-6">🌟</div>
+            <div class="star star-7">✨</div>
+            <div class="star star-8">⭐</div>
+            <div class="star star-9">🌟</div>
+            <div class="star star-10">✨</div>
+        </div>
+        <div class="moon-element"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="main-title">
+                    <span class="sailor-text">A Sailor Moon</span>
+                    <span class="baby-shower-text">Baby Shower</span>
+                </h1>
+                <div class="parents-names">
+                    <span class="heart">💕</span>
+                    Celebrating Clare & Brian's new little moon princess
+                    <span class="heart">💕</span>
+                </div>
+                <div class="sailor-quote">
+                    "In the name of the Moon, we celebrate new life!"
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Party Details Section -->
+    <section id="details" class="details-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-calendar-star"></i>
+                    Party Details
+                </h2>
+                <div class="sailor-wand"></div>
+            </div>
+              <div class="details-grid">
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Date & Time</h3>
+                        <p class="detail-info">
+                            <strong>Saturday, August 16th, 2025</strong><br>
+                            3:00 PM - 6:00 PM
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Location</h3>
+                        <p class="detail-info">
+                            <strong>Kenneth & Matthew Glenn's Home</strong><br>
+                            9718 Renfield Drive<br>
+                            Raleigh NC 27617<br>
+                        </p>
+                        <a href="https://maps.app.goo.gl/PCtPRopDtB8bNaR68" class="location-link" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Get Directions
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Theme</h3>
+                        <p class="detail-info">
+                            Sailor Moon & Magical Girl<br>
+                            <em>Feel free to dress up as your favorite Sailor Scout!</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Registry Section -->
+    <section id="registry" class="registry-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-gift"></i>
+                    Baby Registry
+                </h2>
+                <p class="section-subtitle">Help us prepare for our little moon princess!</p>
+            </div>
+            
+            <div class="registry-content">
+                <div class="registry-main">
+                    <div class="registry-icon-large">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <h3>Our Babylist Registry</h3>
+                    <p class="registry-description">
+                        We've created a wishlist of everything we need for our little one. 
+                        From essentials to special keepsakes, every gift helps us prepare for this magical journey!
+                    </p>
+                    <a href="https://my.babylist.com/clarenbriank" class="registry-btn-large" target="_blank">
+                        <i class="fas fa-external-link-alt"></i>
+                        View Our Registry on Babylist
+                    </a>
+                    <div class="registry-note">
+                        <i class="fas fa-heart"></i>
+                        <span>Your presence is the greatest gift, but if you'd like to contribute, we'd be so grateful!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RSVP Section -->
+    <section id="rsvp" class="rsvp-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heart"></i>
+                    RSVP
+                </h2>
+                <p class="section-subtitle">Please let us know if you can join our celebration!</p>
+            </div>
+            
+            <div class="rsvp-form-container">
+                <form id="rsvpForm" class="rsvp-form">
+                    <div class="form-group">
+                        <label for="guestName">Name(s)</label>
+                        <input type="text" id="guestName" name="guestName" required 
+                               placeholder="Enter your name (and partner's name if applicable)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required 
+                               placeholder="your.email@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Will you be attending?</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="attending-yes" name="attending" value="yes" required>
+                                <label for="attending-yes">
+                                    <i class="fas fa-check-circle"></i>
+                                    Yes, I'll be there!
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="attending-no" name="attending" value="no" required>
+                                <label for="attending-no">
+                                    <i class="fas fa-times-circle"></i>
+                                    Sorry, can't make it
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="attending-maybe" name="attending" value="maybe" required>
+                                <label for="attending-maybe">
+                                    <i class="fas fa-question-circle"></i>
+                                    Maybe - let me check
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                      <div class="form-group">
+                        <label for="guests">Number of Guests</label>
+                        <input type="number" id="guests" name="guests" required min="1" max="10" 
+                               placeholder="How many people will you bring with you, including children?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Special Message (Optional)</label>
+                        <textarea id="message" name="message" rows="4" 
+                                  placeholder="Any special wishes or dietary restrictions?"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Send RSVP
+                    </button>
+                </form>
+                
+                <div id="rsvpSuccess" class="success-message" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Thank you for your RSVP!</h3>
+                    <p>We're excited to celebrate with you! 🌙✨</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-message">
+                    <p>Can't wait to celebrate our little moon baby with all our favorite people! 🌙👶✨</p>
+                </div>
+                <div class="footer-contact">
+                    <p>Questions?<br> Contact Matthew at <a href="mailto:matthew.mark.glenn@gmail.com">matthew.mark.glenn@gmail.com</a></p>
+                </div>
+            </div>
+        </div>    </footer>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

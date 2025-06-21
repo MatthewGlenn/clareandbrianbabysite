@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Test - B                if (typeof loadEnvVars === 'function') {
+                    const envVars = await loadEnvVars();
+                    const webhookUrl = envVars.RSVP_WEBHOOK_URL || 'Not configured in .env';
+                    const discordUrl = envVars.DISCORD_WEBHOOK_URL || 'Not configured in .env';
+                    
+                    document.getElementById('webhook-url').textContent = webhookUrl;
+                    document.getElementById('discord-url').textContent = discordUrl;
+                    
+                    const isConfigured = webhookUrl !== 'Not configured in .env' && discordUrl !== 'Not configured in .env';
+                    const configStatus = isConfigured ? '✅ Fully Configured' : '⚠️ Needs Configuration';
+                    
+                    showResult(`Configuration Test Results:
+📄 .env file loaded: ${Object.keys(envVars).length > 0 ? 'Yes' : 'No'}
+🔧 Configuration Status: ${configStatus}
+🔗 RSVP Webhook URL: ${webhookUrl}
+💬 Discord Webhook URL: ${discordUrl}
+
+${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs before testing.' : ''}`, 
+                        isConfigured ? 'success' : 'error');VP</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .webhook-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🌙 Webhook Test Suite</h1>
+          <div class="webhook-info">
+            <h3>🔗 Webhook Information</h3>
+            <p><strong>RSVP Endpoint:</strong> <span id="webhook-url">Loading...</span></p>
+            <p><strong>Discord Endpoint:</strong> <span id="discord-url">Loading...</span></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Content-Type:</strong> application/json</p>
+        </div>
+          <div class="test-buttons">
+            <button class="test-button" onclick="runConfigTest()">
+                🔧 Test Configuration
+            </button>
+            
+            <button class="test-button" onclick="runQuickTest()">
+                ⚡ Quick Webhook Test
+            </button>
+            
+            <button class="test-button" onclick="runFullTest()">
+                🧪 Full RSVP Test
+            </button>
+            
+            <button class="test-button" onclick="runDiscordTest()">
+                💬 Test Discord Webhook
+            </button>
+            
+            <button class="test-button" onclick="runBothWebhooksTest()">
+                🚀 Test Both Webhooks
+            </button>
+            
+            <button class="test-button" onclick="runCurlCommand()">
+                📋 Generate curl Command
+            </button>
+        </div>
+        
+        <div id="result"></div>
+        
+        <div class="webhook-info" style="margin-top: 30px;">
+            <h3>📝 Expected Webhook Payload</h3>
+            <div class="code-block" id="payload-example">
+{
+  "name": "Guest Name(s)",
+  "email": "guest@example.com",
+  "attending": "yes|no|maybe",
+  "numberOfGuests": 2,
+  "message": "Optional message",
+  "submittedAt": "2025-06-20T15:30:45.123Z",
+  "event": "Clare & Brian's Sailor Moon Baby Shower"
+}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load the main script functions
+        const script = document.createElement('script');
+        script.src = 'script.js';
+        document.head.appendChild(script);
+        
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+        
+        async function runConfigTest() {
+            showResult('Testing configuration...', 'info');
+            
+            try {
+                // Wait for script to load
+                await new Promise(resolve => setTimeout(resolve, 500));
+                  if (typeof loadEnvVars === 'function') {
+                    const envVars = await loadEnvVars();
+                    const webhookUrl = envVars.RSVP_WEBHOOK_URL || 'Not found in .env';
+                    const discordUrl = envVars.DISCORD_WEBHOOK_URL || 'Not configured';
+                    
+                    document.getElementById('webhook-url').textContent = webhookUrl;
+                    document.getElementById('discord-url').textContent = discordUrl;
+                    
+                    showResult(`Configuration Test Results:
+📄 .env file loaded: ${Object.keys(envVars).length > 0 ? 'Yes' : 'No'}
+🔗 RSVP Webhook URL: ${webhookUrl}
+💬 Discord Webhook URL: ${discordUrl}
+🔧 Environment Variables: ${JSON.stringify(envVars, null, 2)}`, 'success');
+                } else {
+                    showResult('Error: Script functions not loaded yet. Please try again.', 'error');
+                }
+            } catch (error) {
+                showResult(`Configuration test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runQuickTest() {
+            showResult('Running quick webhook test...', 'info');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                if (typeof quickWebhookTest === 'function') {
+                    const result = await quickWebhookTest();
+                    showResult(`Quick Test Results:
+✅ Success: ${result.success}
+📥 Response: ${JSON.stringify(result.data || result.error, null, 2)}`, 
+                        result.success ? 'success' : 'error');
+                } else {
+                    showResult('Error: Test functions not loaded. Please refresh and try again.', 'error');
+                }
+            } catch (error) {
+                showResult(`Quick test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runFullTest() {
+            showResult('Running full RSVP webhook test...', 'info');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                if (typeof testWebhook === 'function') {
+                    const result = await testWebhook();
+                    showResult(`Full Test Results:
+✅ Success: ${result.success}
+📤 Test Data Sent: Complete RSVP payload
+📥 Response: ${JSON.stringify(result.data || result.error, null, 2)}`, 
+                        result.success ? 'success' : 'error');
+                } else {
+                    showResult('Error: Test functions not loaded. Please refresh and try again.', 'error');
+                }
+            } catch (error) {
+                showResult(`Full test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runDiscordTest() {
+            showResult('Testing Discord webhook...', 'info');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                if (typeof testDiscordWebhook === 'function') {
+                    const result = await testDiscordWebhook();
+                    showResult(`Discord Test Results:
+✅ Success: ${result.success}
+📥 Response: ${JSON.stringify(result.error || 'Success', null, 2)}
+💬 Check your Discord channel for the message!`, 
+                        result.success ? 'success' : 'error');
+                } else {
+                    showResult('Error: Discord test function not loaded. Please refresh and try again.', 'error');
+                }
+            } catch (error) {
+                showResult(`Discord test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runBothWebhooksTest() {
+            showResult('Testing both main webhook and Discord webhook...', 'info');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                if (typeof testWebhook === 'function') {
+                    const result = await testWebhook();
+                    showResult(`Both Webhooks Test Results:
+✅ Main Webhook: ${result.success}
+💬 Discord notification should appear in your channel
+📥 Response: ${JSON.stringify(result.data || result.error, null, 2)}`, 
+                        result.success ? 'success' : 'error');
+                } else {
+                    showResult('Error: Test functions not loaded. Please refresh and try again.', 'error');
+                }
+            } catch (error) {
+                showResult(`Both webhooks test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runCurlCommand() {
+            showResult('Generating curl command...', 'info');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                  const envVars = await loadEnvVars();
+                const webhookUrl = envVars.RSVP_WEBHOOK_URL || 'Not configured in .env';
+                
+                const curlCommand = `curl -X POST "${webhookUrl}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "name": "Test User & Partner",
+    "email": "test@example.com",
+    "attending": "yes",
+    "numberOfGuests": 2,
+    "message": "Test RSVP from curl command",
+    "submittedAt": "${new Date().toISOString()}",
+    "event": "Clare & Brian's Sailor Moon Baby Shower"
+  }'`;
+                
+                showResult(`curl Command:
+${curlCommand}
+
+Copy and paste this into your terminal to test the webhook directly.`, 'info');
+                
+                // Copy to clipboard if available
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(curlCommand).then(() => {
+                        showResult(`curl Command (copied to clipboard):
+${curlCommand}`, 'success');
+                    });
+                }
+            } catch (error) {
+                showResult(`Failed to generate curl command: ${error.message}`, 'error');
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', () => {
+            setTimeout(runConfigTest, 1000);
+        });
+    </script>
+</body>
+</html>

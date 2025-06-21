@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Inject environment variables into JavaScript
+        env:
+          RSVP_WEBHOOK_URL: ${{ secrets.RSVP_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          # Create a config file that gets injected into the build
+          cat > config.js << EOF
+          window.WEBHOOK_CONFIG = {
+            rsvpUrl: '${RSVP_WEBHOOK_URL}',
+            discordUrl: '${DISCORD_WEBHOOK_URL}',
+            buildTime: '$(date -u +"%Y-%m-%dT%H:%M:%SZ")'
+          };
+          EOF
+          
+          echo "✅ Configuration injected into build"
+            # Verify config file
+          echo "📄 Configuration created:"
+          echo "window.WEBHOOK_CONFIG = { rsvpUrl: '***', discordUrl: '***', buildTime: '...' };"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
