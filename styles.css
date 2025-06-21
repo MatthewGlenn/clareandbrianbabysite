@@ -525,6 +525,8 @@ body {
 .form-group {
     margin-bottom: 2.5rem;
     position: relative;
+    transition: opacity 0.3s ease, height 0.3s ease;
+    overflow: hidden;
 }
 
 .form-group label {
@@ -578,6 +580,13 @@ body {
     color: #b3b3b3;
 }
 
+.form-group.hidden {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
 .radio-group {
     display: flex;
     flex-direction: column;
@@ -626,6 +635,49 @@ body {
 .radio-option label i {
     margin-right: 12px;
     font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+/* Icon colors for attending options */
+#attending-yes + label i.fa-check-circle {
+    color: #28a745; /* Green for yes */
+}
+
+#attending-no + label i.fa-times-circle {
+    color: #dc3545; /* Red for no */
+}
+
+#attending-maybe + label i.fa-question-circle {
+    color: #ffc107; /* Yellow/amber for maybe */
+}
+
+/* Hover effects */
+.radio-option:hover label i.fa-check-circle {
+    color: #218838;
+}
+
+.radio-option:hover label i.fa-times-circle {
+    color: #c82333;
+}
+
+.radio-option:hover label i.fa-question-circle {
+    color: #e0a800;
+}
+
+/* Selected state - make icons slightly brighter */
+input[type="radio"]:checked + label i.fa-check-circle {
+    color: #20c997;
+    text-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+}
+
+input[type="radio"]:checked + label i.fa-times-circle {
+    color: #e74c3c;
+    text-shadow: 0 0 5px rgba(220, 53, 69, 0.3);
+}
+
+input[type="radio"]:checked + label i.fa-question-circle {
+    color: #f39c12;
+    text-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
 }
 
 .submit-btn {

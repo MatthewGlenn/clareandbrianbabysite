@@ -3,25 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhook Test - B                if (typeof loadEnvVars === 'function') {
-                    const envVars = await loadEnvVars();
-                    const webhookUrl = envVars.RSVP_WEBHOOK_URL || 'Not configured in .env';
-                    const discordUrl = envVars.DISCORD_WEBHOOK_URL || 'Not configured in .env';
-                    
-                    document.getElementById('webhook-url').textContent = webhookUrl;
-                    document.getElementById('discord-url').textContent = discordUrl;
-                    
-                    const isConfigured = webhookUrl !== 'Not configured in .env' && discordUrl !== 'Not configured in .env';
-                    const configStatus = isConfigured ? '✅ Fully Configured' : '⚠️ Needs Configuration';
-                    
-                    showResult(`Configuration Test Results:
-📄 .env file loaded: ${Object.keys(envVars).length > 0 ? 'Yes' : 'No'}
-🔧 Configuration Status: ${configStatus}
-🔗 RSVP Webhook URL: ${webhookUrl}
-💬 Discord Webhook URL: ${discordUrl}
-
-${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs before testing.' : ''}`, 
-                        isConfigured ? 'success' : 'error');VP</title>
+    <title>Webhook Test - Clare & Brian's Baby Shower</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -120,15 +102,13 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
 </head>
 <body>
     <div class="test-container">
-        <h1>🌙 Webhook Test Suite</h1>
-          <div class="webhook-info">
+        <h1>🌙 Webhook Test Suite</h1>        <div class="webhook-info">
             <h3>🔗 Webhook Information</h3>
             <p><strong>RSVP Endpoint:</strong> <span id="webhook-url">Loading...</span></p>
             <p><strong>Discord Endpoint:</strong> <span id="discord-url">Loading...</span></p>
             <p><strong>Method:</strong> POST</p>
             <p><strong>Content-Type:</strong> application/json</p>
-        </div>
-          <div class="test-buttons">
+        </div>        <div class="test-buttons">
             <button class="test-button" onclick="runConfigTest()">
                 🔧 Test Configuration
             </button>
@@ -147,6 +127,10 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
             
             <button class="test-button" onclick="runBothWebhooksTest()">
                 🚀 Test Both Webhooks
+            </button>
+            
+            <button class="test-button" onclick="runDiagnostics()">
+                🔍 Diagnose Issues
             </button>
             
             <button class="test-button" onclick="runCurlCommand()">
@@ -170,13 +154,15 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
 }
             </div>
         </div>
-    </div>
-
-    <script>
-        // Load the main script functions
-        const script = document.createElement('script');
-        script.src = 'script.js';
-        document.head.appendChild(script);
+    </div>    <script>
+        // Load the configuration and main script functions
+        const configScript = document.createElement('script');
+        configScript.src = 'config.js';
+        document.head.appendChild(configScript);
+        
+        const mainScript = document.createElement('script');
+        mainScript.src = 'script.js';
+        document.head.appendChild(mainScript);
         
         function showResult(message, type = 'info') {
             const resultDiv = document.getElementById('result');
@@ -188,23 +174,33 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
             showResult('Testing configuration...', 'info');
             
             try {
-                // Wait for script to load
-                await new Promise(resolve => setTimeout(resolve, 500));
-                  if (typeof loadEnvVars === 'function') {
-                    const envVars = await loadEnvVars();
-                    const webhookUrl = envVars.RSVP_WEBHOOK_URL || 'Not found in .env';
-                    const discordUrl = envVars.DISCORD_WEBHOOK_URL || 'Not configured';
+                // Wait for scripts to load
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                if (typeof testWebhookConfig === 'function') {
+                    const config = testWebhookConfig();
                     
-                    document.getElementById('webhook-url').textContent = webhookUrl;
-                    document.getElementById('discord-url').textContent = discordUrl;
-                    
-                    showResult(`Configuration Test Results:
-📄 .env file loaded: ${Object.keys(envVars).length > 0 ? 'Yes' : 'No'}
-🔗 RSVP Webhook URL: ${webhookUrl}
-💬 Discord Webhook URL: ${discordUrl}
-🔧 Environment Variables: ${JSON.stringify(envVars, null, 2)}`, 'success');
+                    if (config) {
+                        document.getElementById('webhook-url').textContent = config.RSVP_WEBHOOK_URL || 'Not configured';
+                        document.getElementById('discord-url').textContent = config.DISCORD_WEBHOOK_URL || 'Not configured';
+                        
+                        const isConfigured = config.RSVP_WEBHOOK_URL && config.DISCORD_WEBHOOK_URL;
+                        const configStatus = isConfigured ? '✅ Fully Configured' : '⚠️ Needs Configuration';
+                        
+                        showResult(`Configuration Test Results:
+📄 Config loaded from: config.js
+🔧 Configuration Status: ${configStatus}
+🔗 RSVP Webhook URL: ${config.RSVP_WEBHOOK_URL || 'Not configured'}
+💬 Discord Webhook URL: ${config.DISCORD_WEBHOOK_URL || 'Not configured'}
+� Build Time: ${window.WEBHOOK_CONFIG?.buildTime || 'Not available'}
+
+${!isConfigured ? '⚠️ Please update config.js with valid webhook URLs before testing.' : '✅ Configuration looks good!'}`, 
+                            isConfigured ? 'success' : 'error');
+                    } else {
+                        showResult('❌ Failed to load webhook configuration. Check if config.js is properly loaded.', 'error');
+                    }
                 } else {
-                    showResult('Error: Script functions not loaded yet. Please try again.', 'error');
+                    showResult('❌ Test functions not loaded. Please refresh and try again.', 'error');
                 }
             } catch (error) {
                 showResult(`Configuration test failed: ${error.message}`, 'error');
@@ -220,11 +216,13 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
                 if (typeof quickWebhookTest === 'function') {
                     const result = await quickWebhookTest();
                     showResult(`Quick Test Results:
-✅ Success: ${result.success}
-📥 Response: ${JSON.stringify(result.data || result.error, null, 2)}`, 
-                        result.success ? 'success' : 'error');
+🚀 Webhook Success: ${result.webhook?.success || false}
+💬 Discord Success: ${result.discord?.success || false}
+📥 Main Response: ${JSON.stringify(result.webhook?.data || result.webhook?.error, null, 2)}
+📥 Discord Response: ${JSON.stringify(result.discord?.error || 'Success', null, 2)}`, 
+                        (result.webhook?.success && result.discord?.success) ? 'success' : 'error');
                 } else {
-                    showResult('Error: Test functions not loaded. Please refresh and try again.', 'error');
+                    showResult('❌ Test functions not loaded. Please refresh and try again.', 'error');
                 }
             } catch (error) {
                 showResult(`Quick test failed: ${error.message}`, 'error');
@@ -240,12 +238,13 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
                 if (typeof testWebhook === 'function') {
                     const result = await testWebhook();
                     showResult(`Full Test Results:
-✅ Success: ${result.success}
-📤 Test Data Sent: Complete RSVP payload
-📥 Response: ${JSON.stringify(result.data || result.error, null, 2)}`, 
+🚀 Webhook Success: ${result.success}
+📤 Test Data: Complete RSVP payload sent
+📥 Response: ${JSON.stringify(result.data || result.error, null, 2)}
+💬 Discord notification: ${result.success ? 'Should appear in Discord channel' : 'May have failed'}`, 
                         result.success ? 'success' : 'error');
                 } else {
-                    showResult('Error: Test functions not loaded. Please refresh and try again.', 'error');
+                    showResult('❌ Test functions not loaded. Please refresh and try again.', 'error');
                 }
             } catch (error) {
                 showResult(`Full test failed: ${error.message}`, 'error');
@@ -253,7 +252,7 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
         }
         
         async function runDiscordTest() {
-            showResult('Testing Discord webhook...', 'info');
+            showResult('Testing Discord webhook only...', 'info');
             
             try {
                 await new Promise(resolve => setTimeout(resolve, 500));
@@ -261,12 +260,12 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
                 if (typeof testDiscordWebhook === 'function') {
                     const result = await testDiscordWebhook();
                     showResult(`Discord Test Results:
-✅ Success: ${result.success}
-📥 Response: ${JSON.stringify(result.error || 'Success', null, 2)}
-💬 Check your Discord channel for the message!`, 
+💬 Success: ${result.success}
+📥 Response: ${JSON.stringify(result.error || 'Success - Check your Discord channel!', null, 2)}
+� Check your Discord channel for the test message!`, 
                         result.success ? 'success' : 'error');
                 } else {
-                    showResult('Error: Discord test function not loaded. Please refresh and try again.', 'error');
+                    showResult('❌ Discord test function not loaded. Please refresh and try again.', 'error');
                 }
             } catch (error) {
                 showResult(`Discord test failed: ${error.message}`, 'error');
@@ -282,15 +281,33 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
                 if (typeof testWebhook === 'function') {
                     const result = await testWebhook();
                     showResult(`Both Webhooks Test Results:
-✅ Main Webhook: ${result.success}
-💬 Discord notification should appear in your channel
-📥 Response: ${JSON.stringify(result.data || result.error, null, 2)}`, 
+🚀 Main Webhook: ${result.success ? '✅ Success' : '❌ Failed'}
+💬 Discord: Should appear in your channel if successful
+📥 Main Response: ${JSON.stringify(result.data || result.error, null, 2)}
+🔔 Check Discord for notification!`, 
                         result.success ? 'success' : 'error');
                 } else {
-                    showResult('Error: Test functions not loaded. Please refresh and try again.', 'error');
+                    showResult('❌ Test functions not loaded. Please refresh and try again.', 'error');
                 }
             } catch (error) {
                 showResult(`Both webhooks test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runDiagnostics() {
+            showResult('Running webhook diagnostics...', 'info');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                if (typeof diagnoseWebhookIssues === 'function') {
+                    await diagnoseWebhookIssues();
+                    showResult('🔍 Diagnostics completed. Check the browser console for detailed results.', 'info');
+                } else {
+                    showResult('❌ Diagnostic function not loaded. Please refresh and try again.', 'error');
+                }
+            } catch (error) {
+                showResult(`Diagnostics failed: ${error.message}`, 'error');
             }
         }
         
@@ -299,11 +316,18 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
             
             try {
                 await new Promise(resolve => setTimeout(resolve, 500));
-                  const envVars = await loadEnvVars();
-                const webhookUrl = envVars.RSVP_WEBHOOK_URL || 'Not configured in .env';
+                
+                const config = window.WEBHOOK_CONFIG;
+                if (!config) {
+                    showResult('❌ Configuration not loaded. Please refresh and try again.', 'error');
+                    return;
+                }
+                
+                const webhookUrl = config.RSVP_WEBHOOK_URL;
                 
                 const curlCommand = `curl -X POST "${webhookUrl}" \\
   -H "Content-Type: application/json" \\
+  -H "User-Agent: SailorMoonBabyShower/1.0" \\
   -d '{
     "name": "Test User & Partner",
     "email": "test@example.com",
@@ -311,19 +335,26 @@ ${!isConfigured ? '⚠️ Please update your .env file with valid webhook URLs b
     "numberOfGuests": 2,
     "message": "Test RSVP from curl command",
     "submittedAt": "${new Date().toISOString()}",
-    "event": "Clare & Brian's Sailor Moon Baby Shower"
+    "event": "Clare & Brian'\''s Sailor Moon Baby Shower",
+    "source": "webhook-test",
+    "userAgent": "curl/test"
   }'`;
                 
                 showResult(`curl Command:
 ${curlCommand}
 
-Copy and paste this into your terminal to test the webhook directly.`, 'info');
+Copy and paste this into your terminal to test the webhook directly.
+This will help determine if the issue is with CORS or the webhook itself.`, 'info');
                 
                 // Copy to clipboard if available
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(curlCommand).then(() => {
-                        showResult(`curl Command (copied to clipboard):
-${curlCommand}`, 'success');
+                        showResult(`curl Command (✅ copied to clipboard):
+${curlCommand}
+
+Paste this in your terminal to test the webhook directly.`, 'success');
+                    }).catch(() => {
+                        // Clipboard failed, but still show the command
                     });
                 }
             } catch (error) {
@@ -333,7 +364,7 @@ ${curlCommand}`, 'success');
         
         // Initialize on load
         window.addEventListener('load', () => {
-            setTimeout(runConfigTest, 1000);
+            setTimeout(runConfigTest, 1500);
         });
     </script>
 </body>

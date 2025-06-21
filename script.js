@@ -22,7 +22,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const rsvpForm = document.getElementById('rsvpForm');
     const successMessage = document.getElementById('rsvpSuccess');
     
-    if (rsvpForm) {
+    if (rsvpForm) {        // Handle attendance radio button changes
+        const attendingRadios = document.querySelectorAll('input[name="attending"]');
+        const guestsInput = document.getElementById('guests');
+        const guestsGroup = guestsInput ? guestsInput.closest('.form-group') : null;
+          attendingRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'no') {
+                    // Hide guests field and set to 0
+                    if (guestsGroup) {
+                        guestsGroup.style.display = 'none';
+                    }
+                    if (guestsInput) {
+                        guestsInput.value = '0';
+                        guestsInput.removeAttribute('required');
+                    }
+                } else {
+                    // Show guests field and make it required
+                    if (guestsGroup) {
+                        guestsGroup.style.display = 'block';
+                    }
+                    if (guestsInput) {
+                        guestsInput.value = '';
+                        guestsInput.setAttribute('required', 'required');
+                    }
+                }
+            });
+        });
+        
         rsvpForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -34,18 +61,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 attending: formData.get('attending'),
                 guests: formData.get('guests'),
                 message: formData.get('message')
-            };
-                  // Validate required fields
-        if (!rsvpData.name || !rsvpData.email || !rsvpData.attending || !rsvpData.guests) {
+            };                  // Validate required fields
+        if (!rsvpData.name || !rsvpData.email || !rsvpData.attending) {
             showNotification('Please fill in all required fields.', 'error');
             return;
         }
         
-        // Validate guest number
-        const guestNumber = parseInt(rsvpData.guests);
-        if (isNaN(guestNumber) || guestNumber < 1 || guestNumber > 10) {
-            showNotification('Please enter a valid number of guests (1-10).', 'error');
-            return;
+        // Validate guest number (skip for "no" attendance)
+        if (rsvpData.attending !== 'no') {
+            if (!rsvpData.guests) {
+                showNotification('Please enter the number of guests.', 'error');
+                return;
+            }
+            
+            const guestNumber = parseInt(rsvpData.guests);
+            if (isNaN(guestNumber) || guestNumber < 1 || guestNumber > 10) {
+                showNotification('Please enter a valid number of guests (1-10).', 'error');
+                return;
+            }
+        } else {
+            // For "no" attendance, ensure guests is set to 0
+            rsvpData.guests = '0';
         }
             
             // Simulate form submission (replace with actual form handling)
@@ -94,8 +130,12 @@ async function submitRSVP(data) {
         const response = await sendToWebhook(validatedData);
         
         if (response.success) {
-            // Also send receipt to Discord
-            await sendToDiscord(validatedData);
+            // Also send receipt to Discord (optional, don't fail if it doesn't work)
+            try {
+                await sendToDiscord(validatedData);
+            } catch (discordError) {
+                console.warn('⚠️ Discord notification failed, but RSVP was recorded:', discordError);
+            }
             
             // Show success message
             document.getElementById('rsvpForm').style.display = 'none';
@@ -106,20 +146,45 @@ async function submitRSVP(data) {
             
             // Add confetti effect
             createConfetti();
+            
         } else {
-            throw new Error(response.error || 'Failed to submit RSVP');
+            // Webhook failed, try fallback method
+            console.log('🔄 Primary webhook failed, attempting fallback...');
+            
+            const fallbackResult = submitRSVPFallback(validatedData);
+            
+            if (fallbackResult.success) {
+                // Show success message even with fallback
+                document.getElementById('rsvpForm').style.display = 'none';
+                document.getElementById('rsvpSuccess').style.display = 'block';
+                
+                // Note: The fallback notification is shown by submitRSVPFallback()
+                // Still add confetti for positive UX
+                createConfetti();
+            } else {
+                throw new Error('Both primary and fallback submission methods failed');
+            }
         }
     } catch (error) {
         console.error('RSVP submission error:', error);
         
-        // Check if it's a configuration error
-        if (error.message.includes('not configured')) {
-            showNotification('Configuration error: Please check webhook setup.', 'error');
-            return;
+        // If all else fails, try the fallback method
+        try {
+            console.log('🔄 Attempting fallback submission due to error...');
+            const fallbackResult = submitRSVPFallback(securityManager.validateSubmission(data));
+            
+            if (fallbackResult.success) {
+                document.getElementById('rsvpForm').style.display = 'none';
+                document.getElementById('rsvpSuccess').style.display = 'block';
+                createConfetti();
+                return; // Exit successfully
+            }
+        } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
         }
         
         // Show user-friendly error message
-        showNotification(error.message || 'Unable to submit RSVP. Please try again.', 'error');
+        showNotification(error.message || 'Unable to submit RSVP. Please try again or use the backup methods provided.', 'error');
     } finally {
         // Reset button
         submitBtn.innerHTML = originalText;
@@ -150,6 +215,8 @@ async function sendToWebhook(data) {
         throw new Error('RSVP webhook URL not configured');
     }
     
+    console.log('🚀 Attempting to send to webhook:', WEBHOOK_URL);
+    
     // Add request headers for better security
     const webhookData = {
         ...data,
@@ -162,15 +229,26 @@ async function sendToWebhook(data) {
     try {
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
+            mode: 'cors', // Explicitly request CORS
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': 'SailorMoonBabyShower/1.0'
+                'User-Agent': 'SailorMoonBabyShower/1.0',
+                'Accept': 'application/json, */*'
             },
             body: JSON.stringify(webhookData)
         });
         
+        console.log('📡 Response status:', response.status, response.statusText);
+        console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+        
         if (!response.ok) {
             const errorText = await response.text();
+            console.error('❌ Webhook error response:', errorText);
+            
+            if (response.status === 404) {
+                throw new Error(`Webhook endpoint not found (404). Please check the webhook URL: ${WEBHOOK_URL}`);
+            }
+            
             throw new Error(`Webhook error: ${response.status} ${response.statusText} - ${errorText}`);
         }
         
@@ -179,15 +257,32 @@ async function sendToWebhook(data) {
         try {
             result = await response.json();
         } catch (e) {
+            console.log('📝 Response is not JSON, treating as success');
             result = { status: 'success', message: 'RSVP submitted successfully' };
         }
         
-        console.log('Successfully sent to webhook:', result);
+        console.log('✅ Successfully sent to webhook:', result);
         
         return { success: true, data: result };
         
     } catch (error) {
-        console.error('Error sending to webhook:', error);
+        console.error('💥 Error sending to webhook:', error);
+        
+        // Check for specific error types
+        if (error.message.includes('NetworkError') || error.message.includes('CORS')) {
+            return { 
+                success: false, 
+                error: 'Unable to connect to webhook service. This may be due to network restrictions or server configuration issues.' 
+            };
+        }
+        
+        if (error.message.includes('404')) {
+            return { 
+                success: false, 
+                error: 'Webhook endpoint not found. Please contact support.' 
+            };
+        }
+        
         return { success: false, error: error.message };
     }
 }
@@ -202,14 +297,15 @@ async function sendToDiscord(data) {
         return { success: true }; // Don't fail if Discord is optional
     }
     
-    const embed = {
+    console.log('🚀 Attempting to send to Discord webhook');
+      const embed = {
         title: "🌙✨ Sailor Moon Baby Shower RSVP",
         color: data.attending === 'yes' ? 0xFF69B4 : data.attending === 'no' ? 0x808080 : 0xFFD700,
         fields: [
-            { name: "� Guest(s)", value: data.name, inline: true },
+            { name: "👥 Guest(s)", value: data.name, inline: true },
             { name: "📧 Email", value: data.email, inline: true },
             { name: "✅ Attending", value: data.attending.toUpperCase(), inline: true },
-            { name: "🎭 Party Size", value: data.numberOfGuests.toString(), inline: true },
+            { name: "🎭 Party Size", value: (data.numberOfGuests || data.guests || '1').toString(), inline: true },
             { name: "📅 Event", value: "Clare & Brian's Baby Shower", inline: true },
             { name: "⏰ Submitted", value: new Date().toLocaleString(), inline: true }
         ],
@@ -218,26 +314,36 @@ async function sendToDiscord(data) {
     };
     
     if (data.message && data.message.trim()) {
-        embed.fields.push({ name: "� Message", value: data.message.trim().substring(0, 500) });
+        embed.fields.push({ name: "💌 Message", value: data.message.trim().substring(0, 500) });
     }
     
     try {
         const response = await fetch(DISCORD_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json, */*'
+            },
             body: JSON.stringify({ embeds: [embed] })
         });
         
+        console.log('📡 Discord response status:', response.status, response.statusText);
+        
         if (!response.ok) {
             const errorText = await response.text();
+            console.error('❌ Discord webhook error response:', errorText);
             throw new Error(`Discord webhook error: ${response.status} ${response.statusText} - ${errorText}`);
         }
         
-        console.log('Successfully sent to Discord');
+        console.log('✅ Successfully sent to Discord');
         return { success: true };
         
     } catch (error) {
-        console.error('Error sending to Discord:', error);
+        console.error('💥 Error sending to Discord:', error);
+        
+        // Don't fail the main submission if Discord fails
+        console.warn('⚠️ Discord notification failed, but RSVP was still recorded');
         return { success: false, error: error.message };
     }
 }
@@ -563,11 +669,18 @@ class SecurityManager {
         if (!['yes', 'no', 'maybe'].includes(data.attending)) {
             errors.push('Invalid attendance selection');
         }
-        
-        // Guest count validation
+          // Guest count validation
         const guests = parseInt(data.guests);
-        if (isNaN(guests) || guests < 1 || guests > 10) {
-            errors.push('Guest count must be 1-10');
+        if (data.attending === 'no') {
+            // For "no" attendance, allow 0 guests
+            if (isNaN(guests) || guests < 0 || guests > 10) {
+                errors.push('Guest count must be 0-10');
+            }
+        } else {
+            // For "yes" or "maybe" attendance, require at least 1 guest
+            if (isNaN(guests) || guests < 1 || guests > 10) {
+                errors.push('Guest count must be 1-10');
+            }
         }
         
         // Message validation (optional but limited)
@@ -579,13 +692,12 @@ class SecurityManager {
             throw new Error(errors.join(', '));
         }
     }
-    
-    sanitizeData(data) {
+      sanitizeData(data) {
         return {
             name: this.sanitizeString(data.name, 100),
             email: data.email.trim().toLowerCase().substring(0, 100),
             attending: data.attending,
-            numberOfGuests: Math.max(1, Math.min(10, parseInt(data.guests))),
+            numberOfGuests: data.attending === 'no' ? 0 : Math.max(1, Math.min(10, parseInt(data.guests))),
             message: data.message ? this.sanitizeString(data.message, 500) : '',
         };
     }
@@ -707,7 +819,10 @@ window.testDiscordWebhook = async function() {
     try {
         console.log('📤 Sending test Discord notification:', testData);
         
-        const response = await sendToDiscord(testData);
+        // Process the data through security manager to get the right format
+        const validatedData = securityManager.validateSubmission(testData);
+        
+        const response = await sendToDiscord(validatedData);
         
         if (response.success) {
             console.log('✅ Discord webhook test successful!');
@@ -726,6 +841,125 @@ window.testDiscordWebhook = async function() {
     }
 };
 
+// Add a webhook diagnostics function
+window.diagnoseWebhookIssues = async function() {
+    console.log('🔍 Diagnosing webhook issues...');
+    
+    const config = getWebhookConfig();
+    console.log('📄 Current configuration:', {
+        rsvpUrl: config.RSVP_WEBHOOK_URL ? '✅ Set' : '❌ Missing',
+        discordUrl: config.DISCORD_WEBHOOK_URL ? '✅ Set' : '❌ Missing'
+    });
+    
+    // Test basic connectivity
+    console.log('🌐 Testing basic connectivity...');
+    
+    try {
+        // Test a simple CORS request to see if the server responds
+        const testResponse = await fetch(config.RSVP_WEBHOOK_URL, {
+            method: 'OPTIONS',
+            mode: 'cors'
+        });
+        console.log('✅ OPTIONS request successful:', testResponse.status);
+    } catch (error) {
+        console.error('❌ OPTIONS request failed:', error.message);
+        console.log('💡 This suggests CORS issues or server problems');
+    }
+    
+    // Check if we're on HTTPS
+    if (window.location.protocol === 'https:' && config.RSVP_WEBHOOK_URL.startsWith('http:')) {
+        console.warn('⚠️ Mixed content warning: HTTPS site trying to access HTTP webhook');
+        console.log('💡 This will be blocked by browsers. Webhook should use HTTPS.');
+    }
+    
+    console.log('🔧 Suggested fixes:');
+    console.log('1. Verify the webhook URL is correct and accessible');
+    console.log('2. Ensure the webhook server has CORS enabled for your domain');
+    console.log('3. Check if the webhook endpoint exists (current getting 404)');
+    console.log('4. Consider using a serverless function as a proxy if CORS cannot be fixed');
+};
+
+// Fallback submission method when webhook fails
+function submitRSVPFallback(data) {
+    console.log('📧 Using fallback submission method...');
+    
+    // Store locally for backup
+    const submissionData = {
+        ...data,
+        submittedAt: new Date().toISOString(),
+        id: Date.now().toString()
+    };
+    
+    // Save to localStorage as backup
+    try {
+        const existingSubmissions = JSON.parse(localStorage.getItem('rsvp_backups') || '[]');
+        existingSubmissions.push(submissionData);
+        localStorage.setItem('rsvp_backups', JSON.stringify(existingSubmissions));
+        console.log('💾 RSVP saved to local backup');
+    } catch (error) {
+        console.warn('⚠️ Could not save to local backup:', error);
+    }
+    
+    // Create mailto link as ultimate fallback
+    const emailSubject = encodeURIComponent('RSVP for Clare & Brian\'s Sailor Moon Baby Shower');
+    const emailBody = encodeURIComponent(`
+RSVP Details:
+Name: ${data.name}
+Email: ${data.email}
+Attending: ${data.attending}
+Number of Guests: ${data.numberOfGuests}
+Message: ${data.message || 'None'}
+Submitted: ${new Date().toLocaleString()}
+
+This RSVP was submitted via the website but the automated system encountered an issue.
+    `.trim());
+      // You'll need to replace this with Clare & Brian's actual email
+    const contactEmail = 'clareandbrianbabyshower@gmail.com'; // UPDATE THIS WITH ACTUAL EMAIL
+    const mailtoLink = `mailto:${contactEmail}?subject=${emailSubject}&body=${emailBody}`;
+    
+    // Show fallback options to user
+    showNotification(`
+        <div>
+            <strong>Submission method unavailable</strong><br>
+            Your RSVP has been saved locally. Please use one of these backup methods:<br>
+            <button onclick="window.open('${mailtoLink}')" style="margin: 5px; padding: 5px 10px; background: #ff69b4; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                📧 Send via Email
+            </button>
+            <button onclick="window.downloadRSVPBackup()" style="margin: 5px; padding: 5px 10px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                💾 Download Backup
+            </button>
+        </div>
+    `, 'error');
+    
+    return { success: true, fallback: true };
+}
+
+// Function to download RSVP backup
+window.downloadRSVPBackup = function() {
+    try {
+        const backups = JSON.parse(localStorage.getItem('rsvp_backups') || '[]');
+        if (backups.length === 0) {
+            alert('No backup RSVPs found');
+            return;
+        }
+        
+        const dataStr = JSON.stringify(backups, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `rsvp-backup-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        showNotification('📥 RSVP backup downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('Error downloading backup:', error);
+        alert('Error downloading backup');
+    }
+};
+
 // Console message for easier testing
 console.log('🌙✨ Sailor Moon Baby Shower Website Loaded! ✨🌙');
 console.log('Available test functions:');
@@ -733,4 +967,6 @@ console.log('- testWebhook() - Test both main webhook and Discord');
 console.log('- testDiscordWebhook() - Test Discord webhook only');
 console.log('- quickWebhookTest() - Quick test of both webhooks');
 console.log('- testWebhookConfig() - Check webhook configuration');
+console.log('- diagnoseWebhookIssues() - Debug webhook connectivity problems');
+console.log('- downloadRSVPBackup() - Download locally stored RSVP backups');
 console.log('💡 Call any of these functions in the console to test webhooks!');
