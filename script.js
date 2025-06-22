@@ -61,28 +61,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 attending: formData.get('attending'),
                 guests: formData.get('guests'),
                 message: formData.get('message')
-            };                  // Validate required fields
-        if (!rsvpData.name || !rsvpData.email || !rsvpData.attending) {
-            showNotification('Please fill in all required fields.', 'error');
-            return;
-        }
-        
-        // Validate guest number (skip for "no" attendance)
-        if (rsvpData.attending !== 'no') {
-            if (!rsvpData.guests) {
-                showNotification('Please enter the number of guests.', 'error');
-                return;
+            };
+
+            // Validate all required fields
+            const validationErrors = [];
+            
+            // Name is required
+            if (!rsvpData.name || rsvpData.name.trim().length === 0) {
+                validationErrors.push('Name is required');
             }
             
-            const guestNumber = parseInt(rsvpData.guests);
-            if (isNaN(guestNumber) || guestNumber < 1 || guestNumber > 10) {
-                showNotification('Please enter a valid number of guests (1-10).', 'error');
+            // Email is required
+            if (!rsvpData.email || rsvpData.email.trim().length === 0) {
+                validationErrors.push('Email is required');
+            } else {
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(rsvpData.email.trim())) {
+                    validationErrors.push('Please enter a valid email address');
+                }
+            }
+            
+            // Attendance is required
+            if (!rsvpData.attending) {
+                validationErrors.push('Please select whether you will be attending');
+            }
+            
+            // Guest number validation based on attendance
+            if (rsvpData.attending === 'yes' || rsvpData.attending === 'maybe') {
+                if (!rsvpData.guests || rsvpData.guests.trim().length === 0) {
+                    validationErrors.push('Number of guests is required');
+                } else {
+                    const guestNumber = parseInt(rsvpData.guests);
+                    if (isNaN(guestNumber) || guestNumber < 1 || guestNumber > 10) {
+                        validationErrors.push('Please enter a valid number of guests (1-10)');
+                    }
+                }
+            } else if (rsvpData.attending === 'no') {
+                // For "no" attendance, ensure guests is set to 0
+                rsvpData.guests = '0';
+            }
+            
+            // If there are validation errors, show them and return
+            if (validationErrors.length > 0) {
+                showNotification(validationErrors.join('<br>'), 'error');
                 return;
             }
-        } else {
-            // For "no" attendance, ensure guests is set to 0
-            rsvpData.guests = '0';
-        }
             
             // Simulate form submission (replace with actual form handling)
             submitRSVP(rsvpData);
@@ -654,36 +678,49 @@ class SecurityManager {
     validateInputData(data) {
         const errors = [];
         
-        // Name validation
-        if (!data.name || data.name.trim().length < 2 || data.name.length > 100) {
+        // Name validation - required
+        if (!data.name || data.name.trim().length === 0) {
+            errors.push('Name is required');
+        } else if (data.name.trim().length < 2 || data.name.length > 100) {
             errors.push('Name must be 2-100 characters');
         }
         
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!data.email || !emailRegex.test(data.email) || data.email.length > 100) {
-            errors.push('Please enter a valid email address');
+        // Email validation - required
+        if (!data.email || data.email.trim().length === 0) {
+            errors.push('Email is required');
+        } else {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(data.email) || data.email.length > 100) {
+                errors.push('Please enter a valid email address');
+            }
         }
         
-        // Attendance validation
-        if (!['yes', 'no', 'maybe'].includes(data.attending)) {
+        // Attendance validation - required
+        if (!data.attending) {
+            errors.push('Please select whether you will be attending');
+        } else if (!['yes', 'no', 'maybe'].includes(data.attending)) {
             errors.push('Invalid attendance selection');
         }
-          // Guest count validation
-        const guests = parseInt(data.guests);
-        if (data.attending === 'no') {
+        
+        // Guest count validation - required for yes/maybe attendance
+        if (data.attending === 'yes' || data.attending === 'maybe') {
+            if (!data.guests || data.guests.toString().trim().length === 0) {
+                errors.push('Number of guests is required');
+            } else {
+                const guests = parseInt(data.guests);
+                if (isNaN(guests) || guests < 1 || guests > 10) {
+                    errors.push('Guest count must be 1-10');
+                }
+            }
+        } else if (data.attending === 'no') {
             // For "no" attendance, allow 0 guests
+            const guests = parseInt(data.guests);
             if (isNaN(guests) || guests < 0 || guests > 10) {
                 errors.push('Guest count must be 0-10');
             }
-        } else {
-            // For "yes" or "maybe" attendance, require at least 1 guest
-            if (isNaN(guests) || guests < 1 || guests > 10) {
-                errors.push('Guest count must be 1-10');
-            }
         }
         
-        // Message validation (optional but limited)
+        // Message validation - optional but limited if provided
         if (data.message && data.message.length > 500) {
             errors.push('Message must be under 500 characters');
         }
