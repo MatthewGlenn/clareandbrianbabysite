@@ -997,6 +997,65 @@ window.downloadRSVPBackup = function() {
     }
 };
 
+// Calendar invite functionality
+    function initializeCalendarLinks() {
+        // Event details
+        const eventDetails = {
+            title: "Clare & Brian's Sailor Moon Baby Shower",
+            startDate: "20250816T190000Z", // August 16, 2025 3:00 PM EDT (UTC)
+            endDate: "20250816T220000Z",   // August 16, 2025 6:00 PM EDT (UTC)
+            location: "Kenneth & Matthew Glenn's Home, 9718 Renfield Drive, Raleigh NC 27617",
+            description: "Join us for a magical Sailor Moon themed baby shower celebrating Clare & Brian's new little moon princess or prince! Feel free to dress up as your favorite Sailor Scout!"
+        };
+
+        // Google Calendar link
+        const gcalLink = document.getElementById('gcal-link');
+        if (gcalLink) {
+            const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&dates=${eventDetails.startDate}/${eventDetails.endDate}&location=${encodeURIComponent(eventDetails.location)}&details=${encodeURIComponent(eventDetails.description)}`;
+            gcalLink.href = gcalUrl;
+        }
+
+        // iCal download link
+        const icalLink = document.getElementById('ical-link');
+        if (icalLink) {
+            icalLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                generateICalFile(eventDetails);
+            });
+        }
+    }
+
+    function generateICalFile(eventDetails) {
+        const icalContent = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Clare & Brian//Baby Shower//EN',
+            'BEGIN:VEVENT',
+            'UID:' + Date.now() + '@clarebrianbaby.com',
+            'DTSTAMP:' + new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z',
+            'DTSTART:' + eventDetails.startDate,
+            'DTEND:' + eventDetails.endDate,
+            'SUMMARY:' + eventDetails.title,
+            'DESCRIPTION:' + eventDetails.description,
+            'LOCATION:' + eventDetails.location,
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n');
+
+        const blob = new Blob([icalContent], { type: 'text/calendar;charset=utf-8' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'clare-brian-baby-shower.ics';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }
+
+    // Initialize calendar links
+    initializeCalendarLinks();
+
 // Console message for easier testing
 console.log('🌙✨ Sailor Moon Baby Shower Website Loaded! ✨🌙');
 console.log('Available test functions:');

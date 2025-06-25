@@ -9,8 +9,44 @@ body {
     font-family: 'Quicksand', sans-serif;
     line-height: 1.6;
     color: #e8eaed;
-    background-color: #1a1a2e;
+    background: linear-gradient(
+        90deg,
+        /* Sailor Moon side - Navy, blush pink, gold */
+        #1a237e 0%,
+        #3949ab 25%,
+        #5c6bc0 50%,
+        /* Gundam side - Chrome, cobalt blue, red */
+        #37474f 50%,
+        #455a64 75%,
+        #263238 100%
+    );
+    background-attachment: fixed;
     overflow-x: hidden;
+}
+
+/* Add the overlay pattern to body as well */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Sailor Moon side - star field */
+        radial-gradient(circle at 15% 20%, rgba(255, 215, 0, 0.2) 1px, transparent 1px),
+        radial-gradient(circle at 35% 60%, rgba(255, 182, 193, 0.15) 1px, transparent 1px),
+        radial-gradient(circle at 25% 80%, rgba(255, 215, 0, 0.1) 1px, transparent 1px),
+        /* Gundam side - metallic chrome pattern */
+        linear-gradient(90deg, transparent 0%, transparent 50%, 
+                       rgba(138, 43, 226, 0.1) 50%, rgba(138, 43, 226, 0.1) 52%, 
+                       transparent 52%, transparent 100%),
+        linear-gradient(0deg, transparent 0%, transparent 50%, 
+                       rgba(220, 20, 60, 0.1) 50%, rgba(220, 20, 60, 0.1) 52%, 
+                       transparent 52%, transparent 100%);
+    background-size: 40px 40px, 60px 60px, 50px 50px, 30px 30px, 30px 30px;
+    pointer-events: none;
+    z-index: -1;
 }
 
 .container {
@@ -19,44 +55,49 @@ body {
     padding: 0 20px;
 }
 
-/* Hero Section */
+/* Hero Section - Split Banner Design */
 .hero-section {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     position: relative;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    background: transparent; /* Remove hero-specific background */
+}
+
+/* Split banner overlay effects - Remove since it's now on body */
+.hero-section::before {
+    display: none; /* Remove the overlay from hero section since it's on body now */
 }
 
 .stars-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+    width: 50%;
     height: 100%;
+    left: 0;
+    top: 0;
     pointer-events: none;
-    z-index: 1;
+    z-index: 3;
 }
 
 .star {
     position: absolute;
     font-size: 1.5rem;
-    animation: twinkle 2s ease-in-out infinite;
+    animation: twinkle 3s ease-in-out infinite;
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
 }
 
 .star-1 { top: 15%; left: 10%; animation-delay: 0s; }
-.star-2 { top: 25%; left: 85%; animation-delay: 0.3s; }
+.star-2 { top: 25%; left: 35%; animation-delay: 0.3s; }
 .star-3 { top: 35%; left: 20%; animation-delay: 0.6s; }
-.star-4 { top: 45%; left: 75%; animation-delay: 0.9s; }
+.star-4 { top: 45%; left: 40%; animation-delay: 0.9s; }
 .star-5 { top: 55%; left: 15%; animation-delay: 1.2s; }
-.star-6 { top: 65%; left: 80%; animation-delay: 1.5s; }
+.star-6 { top: 65%; left: 30%; animation-delay: 1.5s; }
 .star-7 { top: 75%; left: 25%; animation-delay: 1.8s; }
-.star-8 { top: 20%; left: 60%; animation-delay: 0.4s; }
-.star-9 { top: 40%; left: 45%; animation-delay: 0.7s; }
-.star-10 { top: 70%; left: 55%; animation-delay: 1.0s; }
+.star-8 { top: 20%; left: 45%; animation-delay: 0.4s; }
+.star-9 { top: 40%; left: 35%; animation-delay: 0.7s; }
+.star-10 { top: 70%; left: 45%; animation-delay: 1.0s; }
 
 @keyframes twinkle {
     0%, 100% { 
@@ -69,15 +110,21 @@ body {
     }
 }
 
+/* Enhanced moon element for Sailor Moon side */
 .moon-element {
     position: absolute;
-    top: 10%;
-    right: 10%;
+    left: 25%;
+    top: 20%;
     width: 150px;
     height: 150px;
-    background: radial-gradient(circle at 30% 30%, #f8f9fa, #e9ecef);
+    background: radial-gradient(circle at 30% 30%, 
+                               #f8f8f8 0%, 
+                               #e0e0e0 70%, 
+                               #c0c0c0 100%);
     border-radius: 50%;
-    box-shadow: 0 0 50px rgba(248, 249, 250, 0.4), 0 0 100px rgba(248, 249, 250, 0.2);
+    box-shadow: 
+        0 0 50px rgba(255, 255, 255, 0.3),
+        inset -20px -20px 0 rgba(200, 200, 200, 0.2);
     animation: float 6s ease-in-out infinite;
     z-index: 2;
 }
@@ -87,61 +134,232 @@ body {
     50% { transform: translateY(-20px); }
 }
 
+/* Sailor Moon Icons */
+.sailor-icons {
+    position: absolute;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.crescent-moon {
+    position: absolute;
+    left: 20%;
+    bottom: 15%;
+    font-size: 4rem;
+    color: #ffd700;
+    transform: rotate(-15deg);
+    animation: moonGlow 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+}
+
+@keyframes moonGlow {
+    0%, 100% { opacity: 0.7; transform: rotate(-15deg) scale(1); }
+    50% { opacity: 1; transform: rotate(-15deg) scale(1.1); }
+}
+
+.sparkle-trail {
+    position: absolute;
+    left: 15%;
+    top: 30%;
+    display: flex;
+    gap: 20px;
+    animation: sparkleFloat 5s ease-in-out infinite;
+}
+
+.sparkle {
+    font-size: 2rem;
+    animation: sparkleRotate 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 182, 193, 0.8));
+}
+
+.sparkle:nth-child(1) { animation-delay: 0s; color: #ffb6c1; }
+.sparkle:nth-child(2) { animation-delay: 0.5s; color: #ffd700; }
+.sparkle:nth-child(3) { animation-delay: 1s; color: #ff69b4; }
+
+@keyframes sparkleFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes sparkleRotate {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.2); }
+}
+
+/* Gundam Icons */
+.gundam-icons {
+    position: absolute;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.pilot-helmet {
+    position: absolute;
+    right: 20%;
+    bottom: 15%;
+    font-size: 4rem;
+    color: #1e88e5;
+    animation: helmetPulse 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(30, 136, 229, 0.6));
+}
+
+@keyframes helmetPulse {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.gear-elements {
+    position: absolute;
+    right: 15%;
+    top: 25%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.gear-elements i {
+    font-size: 2.5rem;
+    animation: gearRotate 4s linear infinite;
+}
+
+.gear-1 { 
+    color: #dc143c; 
+    animation-direction: normal;
+    filter: drop-shadow(0 0 15px rgba(220, 20, 60, 0.5));
+}
+
+.gear-2 { 
+    color: #c0c0c0; 
+    animation-direction: reverse; 
+    animation-duration: 3s;
+    filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.5));
+}
+
+.gear-3 { 
+    color: #1e88e5; 
+    animation-direction: normal; 
+    animation-duration: 5s;
+    filter: drop-shadow(0 0 15px rgba(30, 136, 229, 0.5));
+}
+
+@keyframes gearRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Metallic panels for Gundam side */
+.metallic-panels {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background: 
+        linear-gradient(45deg, transparent 30%, rgba(192, 192, 192, 0.1) 32%, rgba(192, 192, 192, 0.1) 34%, transparent 36%),
+        linear-gradient(-45deg, transparent 30%, rgba(30, 136, 229, 0.08) 32%, rgba(30, 136, 229, 0.08) 34%, transparent 36%);
+    background-size: 80px 80px;
+    z-index: 1;
+}
+
+/* Center divider line */
+.theme-divider {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, 
+                               rgba(255, 255, 255, 0.3) 0%,
+                               rgba(255, 255, 255, 0.6) 50%,
+                               rgba(255, 255, 255, 0.3) 100%);
+    z-index: 4;
+}
+
 .hero-content {
     text-align: center;
-    z-index: 2;
     position: relative;
+    z-index: 5;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .main-title {
-    font-size: 4rem;
+    font-family: 'Dancing Script', cursive;
+    font-size: 4.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
 }
 
 .sailor-text {
     display: block;
-    color: #fff;
-    font-size: 3.5rem;
+    background: linear-gradient(45deg, #ffd700, #ffb6c1, #ff69b4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 4rem;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.2) saturate(1.3); }
 }
 
 .baby-shower-text {
     display: block;
-    color: #ffd700;
-    font-size: 2.5rem;
+    background: linear-gradient(45deg, #1e88e5, #c0c0c0, #dc143c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 3rem;
     font-style: italic;
     margin-top: -10px;
+    letter-spacing: 1px;
 }
 
 .parents-names {
     font-size: 1.8rem;
     color: #fff;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     font-weight: 500;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .heart {
     color: #ff69b4;
-    animation: pulse 2s ease-in-out infinite;
+    animation: heartPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.6));
 }
 
-@keyframes pulse {
+@keyframes heartPulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    50% { transform: scale(1.2); }
 }
 
 .sailor-quote {
-    font-size: 1.2rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.3rem;
     color: #f8f9fa;
     font-style: italic;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 15px 30px;
-    border-radius: 25px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+    background: linear-gradient(135deg, 
+                               rgba(255, 182, 193, 0.2) 0%, 
+                               rgba(30, 136, 229, 0.2) 100%);
+    padding: 20px 35px;
+    border-radius: 30px;
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Navigation */
@@ -202,58 +420,111 @@ body {
     width: 80%;
 }
 
-/* Section Styles */
+/* Section Styles - Updated for Gundam Wing x Sailor Moon Theme */
 .details-section,
 .registry-section,
-.rsvp-section {
-    padding: 6rem 0 5rem 0; /* Extra top padding for fixed nav */
-    scroll-margin-top: 80px; /* Smooth scroll offset for fixed nav */
+.rsvp-section,
+.betting-section {
+    padding: 6rem 0 5rem 0;
+    scroll-margin-top: 80px;
+    position: relative;
+    background: rgba(0, 0, 0, 0.3); /* Semi-transparent dark overlay for content readability */
+    backdrop-filter: blur(1px); /* Slight blur for depth */
 }
 
 .details-section {
-    background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+    background: rgba(26, 35, 126, 0.2); /* Semi-transparent sailor moon color */
 }
 
 .registry-section {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: rgba(55, 71, 79, 0.2); /* Semi-transparent gundam color */
 }
 
 .rsvp-section {
-    background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+    background: rgba(26, 35, 126, 0.15); /* Slightly more transparent */
+}
+
+.betting-section {
+    background: rgba(123, 31, 162, 0.2); /* Semi-transparent purple */
 }
 
 .section-header {
     text-align: center;
     margin-bottom: 4rem;
+    position: relative;
 }
 
 .section-title {
-    font-size: 2.5rem;
-    color: #e8eaed;
+    font-family: 'Dancing Script', cursive;
+    font-size: 3rem;
+    color: #fff;
     margin-bottom: 1rem;
     font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.details-section .section-title {
+    background: linear-gradient(45deg, #ffd700, #ffb6c1, #ff69b4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.registry-section .section-title,
+.rsvp-section .section-title {
+    background: linear-gradient(45deg, #1e88e5, #c0c0c0, #dc143c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.betting-section .section-title {
+    background: linear-gradient(45deg, #ff69b4, #ffd700, #1e88e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .section-title i {
     color: #ffd700;
     margin-right: 15px;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
 }
 
 .section-subtitle {
     font-size: 1.2rem;
-    color: #b3b3b3;
+    color: #e8eaed;
     font-style: italic;
+    font-weight: 500;
 }
 
 .sailor-wand {
-    width: 60px;
+    width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #ffd700, #ff69b4);
+    background: linear-gradient(90deg, #ffd700, #ffb6c1, #ff69b4);
     margin: 1rem auto;
     border-radius: 2px;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+    position: relative;
 }
 
-/* Details Grid - Less Boxy Design */
+.sailor-wand::before {
+    content: '✨';
+    position: absolute;
+    left: -10px;
+    top: -10px;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+.sailor-wand::after {
+    content: '✨';
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    animation: sparkle 2s ease-in-out infinite 0.5s;
+}
+
+/* Details Grid - Enhanced Theme Styling */
 .details-grid {
     display: flex;
     flex-direction: column;
@@ -262,7 +533,10 @@ body {
 }
 
 .detail-card {
-    background: rgba(26, 26, 46, 0.8);
+    background: linear-gradient(135deg, 
+                               rgba(255, 182, 193, 0.1) 0%, 
+                               rgba(26, 26, 46, 0.9) 50%, 
+                               rgba(30, 136, 229, 0.1) 100%);
     padding: 2.5rem;
     border-radius: 25px;
     display: flex;
@@ -270,8 +544,8 @@ body {
     gap: 2rem;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
     position: relative;
     overflow: hidden;
 }
@@ -283,7 +557,10 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background: linear-gradient(90deg, 
+                               transparent, 
+                               rgba(255, 215, 0, 0.2), 
+                               transparent);
     transition: left 0.6s ease;
 }
 
@@ -294,6 +571,7 @@ body {
 .detail-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 215, 0, 0.3);
 }
 
 .detail-card:nth-child(even) {
@@ -302,11 +580,15 @@ body {
 
 .detail-icon {
     font-size: 4rem;
-    color: #ffd700;
+    background: linear-gradient(45deg, #ffd700, #ff69b4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     min-width: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
 }
 
 .detail-content {
@@ -314,30 +596,39 @@ body {
 }
 
 .detail-card h3 {
-    font-size: 1.8rem;
-    color: #e8eaed;
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    background: linear-gradient(45deg, #ffd700, #ffb6c1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 1rem;
     font-weight: 600;
 }
 
 .detail-info {
-    color: #b3b3b3;
+    color: #e8eaed;
     line-height: 1.8;
     margin-bottom: 1rem;
     font-size: 1.1rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .location-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #ffd700;
+    background: linear-gradient(45deg, #1e88e5, #c0c0c0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.3s ease;
-    padding: 8px 16px;
-    border-radius: 15px;
-    background: rgba(255, 215, 0, 0.1);
+    padding: 12px 20px;
+    border-radius: 20px;
+    background-color: rgba(30, 136, 229, 0.1);
+    border: 2px solid rgba(30, 136, 229, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -349,7 +640,10 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, 
+                               transparent, 
+                               rgba(30, 136, 229, 0.3), 
+                               transparent);
     transition: left 0.6s ease;
 }
 
@@ -358,12 +652,12 @@ body {
 }
 
 .location-link:hover {
-    color: #764ba2;
-    background: rgba(102, 126, 234, 0.2);
     transform: translateX(5px);
+    border-color: rgba(30, 136, 229, 0.4);
+    box-shadow: 0 5px 15px rgba(30, 136, 229, 0.3);
 }
 
-/* Registry Section - Simplified Design */
+/* Registry Section - Enhanced Gundam Theme */
 .registry-content {
     display: flex;
     justify-content: center;
@@ -372,13 +666,16 @@ body {
 }
 
 .registry-main {
-    background: rgba(26, 26, 46, 0.9);
+    background: linear-gradient(135deg, 
+                               rgba(30, 136, 229, 0.1) 0%, 
+                               rgba(26, 26, 46, 0.9) 50%, 
+                               rgba(220, 20, 60, 0.1) 100%);
     padding: 4rem 3rem;
     border-radius: 30px;
     text-align: center;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(192, 192, 192, 0.2);
     max-width: 600px;
     width: 100%;
     position: relative;
@@ -392,28 +689,37 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    /* transform: rotate(45deg); */
+    background: linear-gradient(45deg, 
+                               rgba(255, 215, 0, 0.05), 
+                               transparent, 
+                               rgba(138, 43, 226, 0.05));
     transition: all 0.6s ease;
     opacity: 0;
 }
 
 .registry-main:hover::before {
     opacity: 1;
-    /* transform: rotate(45deg) translate(50%, 50%); */
 }
 
 .registry-icon-large {
     font-size: 4rem;
-    color: #ff69b4;
+    background: linear-gradient(45deg, #1e88e5, #dc143c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 2rem;
     position: relative;
     z-index: 2;
+    filter: drop-shadow(0 0 15px rgba(30, 136, 229, 0.5));
 }
 
 .registry-main h3 {
-    font-size: 2.2rem;
-    color: #e8eaed;
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, #1e88e5, #c0c0c0, #dc143c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 1.5rem;
     font-weight: 700;
     position: relative;
@@ -421,17 +727,18 @@ body {
 }
 
 .registry-description {
-    color: #b3b3b3;
+    color: #e8eaed;
     font-size: 1.1rem;
     line-height: 1.7;
     margin-bottom: 2.5rem;
     position: relative;
     z-index: 2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .registry-btn-large {
     display: inline-block;
-    background: linear-gradient(135deg, #ff69b4, #667eea);
+    background: linear-gradient(135deg, #1e88e5, #dc143c);
     color: white;
     padding: 18px 36px;
     border-radius: 30px;
@@ -441,11 +748,12 @@ body {
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
+    box-shadow: 0 10px 30px rgba(30, 136, 229, 0.3);
     position: relative;
     z-index: 2;
     margin-bottom: 2rem;
     overflow: hidden;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .registry-btn-large::before {
@@ -455,7 +763,10 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background: linear-gradient(90deg, 
+                               transparent, 
+                               rgba(255, 255, 255, 0.2), 
+                               transparent);
     transition: left 0.5s ease;
 }
 
@@ -465,8 +776,8 @@ body {
 
 .registry-btn-large:hover {
     transform: translateY(-8px);
-    box-shadow: 0 25px 50px rgba(255, 105, 180, 0.4);
-    background: linear-gradient(135deg, #ff1493, #4169e1);
+    box-shadow: 0 25px 50px rgba(30, 136, 229, 0.4);
+    background: linear-gradient(135deg, #1565c0, #b71c1c);
 }
 
 .registry-note {
@@ -474,34 +785,39 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: rgba(255, 105, 180, 0.1);
+    background: rgba(192, 192, 192, 0.1);
     padding: 15px 25px;
     border-radius: 20px;
-    border: 1px solid rgba(255, 105, 180, 0.2);
+    border: 1px solid rgba(192, 192, 192, 0.2);
     font-style: italic;
     color: #e8eaed;
     position: relative;
     z-index: 2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .registry-note i {
-    color: #ff69b4;
+    color: #dc143c;
     font-size: 1.1rem;
+    filter: drop-shadow(0 0 5px rgba(220, 20, 60, 0.5));
 }
 
-/* RSVP Form - More Flowing Design */
+/* RSVP Form - Enhanced Dual Theme Design */
 .rsvp-form-container {
     max-width: 700px;
     margin: 0 auto;
 }
 
 .rsvp-form {
-    background: rgba(26, 26, 46, 0.9);
+    background: linear-gradient(135deg, 
+                               rgba(255, 182, 193, 0.1) 0%, 
+                               rgba(26, 26, 46, 0.9) 50%, 
+                               rgba(30, 136, 229, 0.1) 100%);
     padding: 3.5rem;
     border-radius: 30px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
 }
@@ -513,7 +829,10 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background: linear-gradient(45deg, 
+                               rgba(255, 215, 0, 0.05), 
+                               transparent, 
+                               rgba(30, 136, 229, 0.05));
     transition: all 0.6s ease;
     opacity: 0;
 }
@@ -536,6 +855,7 @@ body {
     color: #e8eaed;
     font-size: 1.1rem;
     position: relative;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .form-group label::after {
@@ -545,12 +865,12 @@ body {
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, #ffd700, #ff69b4);
+    background: linear-gradient(90deg, #ffd700, #ff69b4, #1e88e5);
     transition: width 0.3s ease;
 }
 
 .form-group:focus-within label::after {
-    width: 40px;
+    width: 60px;
 }
 
 .form-group input,
@@ -564,13 +884,14 @@ body {
     font-family: inherit;
     background: rgba(26, 26, 46, 0.8);
     color: #e8eaed;
+    backdrop-filter: blur(10px);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
     border-color: #ffd700;
-    box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15);
     transform: translateY(-2px);
     background: rgba(26, 26, 46, 0.9);
 }
@@ -682,7 +1003,7 @@ input[type="radio"]:checked + label i.fa-question-circle {
 
 .submit-btn {
     width: 100%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #ffd700, #ff69b4, #1e88e5);
     color: white;
     padding: 20px;
     border: none;
@@ -694,6 +1015,8 @@ input[type="radio"]:checked + label i.fa-question-circle {
     font-family: inherit;
     position: relative;
     overflow: hidden;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
 }
 
 .submit-btn::before {
@@ -703,7 +1026,10 @@ input[type="radio"]:checked + label i.fa-question-circle {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, 
+                               transparent, 
+                               rgba(255, 255, 255, 0.3), 
+                               transparent);
     transition: left 0.6s ease;
 }
 
@@ -713,8 +1039,8 @@ input[type="radio"]:checked + label i.fa-question-circle {
 
 .submit-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
-    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+    box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+    background: linear-gradient(135deg, #ffb300, #e91e63, #1565c0);
 }
 
 .success-message {
@@ -738,9 +1064,68 @@ input[type="radio"]:checked + label i.fa-question-circle {
     font-size: 1.8rem;
 }
 
+/* Calendar Links Styles */
+.calendar-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.calendar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(45deg, #ffd700, #ffb6c1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 12px 18px;
+    border-radius: 18px;
+    background-color: rgba(255, 215, 0, 0.1);
+    border: 2px solid rgba(255, 215, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+
+.calendar-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+                               transparent, 
+                               rgba(255, 215, 0, 0.3), 
+                               transparent);
+    transition: left 0.6s ease;
+}
+
+.calendar-link:hover::before {
+    left: 100%;
+}
+
+.calendar-link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 215, 0, 0.4);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.calendar-link i {
+    font-size: 1rem;
+    color: #ffd700;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+}
+
 /* Footer */
 .footer {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    background: rgba(26, 26, 46, 0.4); /* Semi-transparent to show banner */
+    backdrop-filter: blur(2px);
     color: white;
     padding: 3rem 0;
     text-align: center;
@@ -764,7 +1149,216 @@ input[type="radio"]:checked + label i.fa-question-circle {
     text-decoration: underline;
 }
 
-/* Responsive Design */
+/* Betting Section - Fun Interactive Design - styling now handled above */
+
+.betting-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+}
+
+.betting-main {
+    background: linear-gradient(135deg, 
+                               rgba(255, 105, 180, 0.1) 0%, 
+                               rgba(26, 26, 46, 0.9) 50%, 
+                               rgba(30, 136, 229, 0.1) 100%);
+    padding: 4rem 3rem;
+    border-radius: 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    max-width: 800px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.betting-main::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+                               rgba(255, 215, 0, 0.05), 
+                               transparent, 
+                               rgba(138, 43, 226, 0.05));
+    transition: all 0.6s ease;
+    opacity: 0;
+}
+
+.betting-main:hover::before {
+    opacity: 1;
+}
+
+.betting-icon-large {
+    font-size: 4rem;
+    background: linear-gradient(45deg, #ff69b4, #ffd700, #1e88e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.5));
+}
+
+.betting-main h3 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, #ffd700, #ff69b4, #1e88e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    position: relative;
+    z-index: 2;
+}
+
+.betting-description {
+    color: #e8eaed;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.betting-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.betting-card {
+    background: rgba(26, 26, 46, 0.8);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.betting-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 215, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.betting-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.betting-card-header i {
+    font-size: 1.5rem;
+    color: #ffd700;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+}
+
+.betting-card h4 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem;
+    color: #e8eaed;
+    margin: 0;
+}
+
+.betting-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.choice {
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    color: #e8eaed;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.choice:hover {
+    background: rgba(255, 215, 0, 0.2);
+    transform: translateX(5px);
+}
+
+.sailor-choice:hover {
+    background: rgba(255, 105, 180, 0.2);
+}
+
+.gundam-choice:hover {
+    background: rgba(30, 136, 229, 0.2);
+}
+
+.venmo-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.venmo-section h4 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    color: #ffd700;
+    margin-bottom: 1rem;
+}
+
+.venmo-section p {
+    color: #e8eaed;
+    margin-bottom: 1.5rem;
+}
+
+.venmo-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #3d95ce, #008cff);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 25px rgba(61, 149, 206, 0.3);
+}
+
+.venmo-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(61, 149, 206, 0.4);
+    background: linear-gradient(135deg, #2980b9, #0066cc);
+}
+
+.venmo-btn i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+.betting-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #ffd700;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.betting-note i {
+    color: #ffd700;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+}
+
 @media (max-width: 768px) {
     .main-title {
         font-size: 2.5rem;
@@ -849,6 +1443,15 @@ input[type="radio"]:checked + label i.fa-question-circle {
         height: 100px;
         top: 5%;
         right: 5%;
+    }
+    
+    /* Betting Section Mobile */
+    .betting-main {
+        padding: 3rem 2rem;
+    }
+    
+    .betting-options {
+        grid-template-columns: 1fr;
     }
 }
 
